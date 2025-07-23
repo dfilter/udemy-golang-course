@@ -1,14 +1,44 @@
 package main
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+	"os"
+	"strconv"
+)
+
+const accountBalanceFile = "balance.txt"
+
+func getBalanceFromFile() (float64, error) {
+	fileData, err := os.ReadFile(accountBalanceFile)
+	if err != nil {
+		return 1000, errors.New("failed to find balance file")
+	}
+	balaceText := string(fileData)
+	balanceValue, err := strconv.ParseFloat(balaceText, 64)
+	if err != nil {
+		return 1000, errors.New("failed parse stored balance value")
+	}
+	return balanceValue, nil
+}
+
+func writeBalaceToFile(balance float64) {
+	balanceText := fmt.Sprint(balance)
+	os.WriteFile(accountBalanceFile, []byte(balanceText), 0644)
+}
 
 func main() {
-	var accountBalance = 1000.0
+	accountBalance, err := getBalanceFromFile()
+	if err != nil {
+		fmt.Printf("ERROR \n%v\n-----\n", err)
+		// to exit the process one can use the panic function
+		// panic("You don't have an account with us you filthy hacker!")
+	}
 
 	fmt.Println("Welcome to Go Bank!")
 
 	for {
-		fmt.Printf(`What do you want to do?
+		fmt.Print(`What do you want to do?
 1. Check balance
 2. Deposit money
 3. Withdraw money
@@ -18,9 +48,10 @@ Your choice: `)
 		var choice int
 		fmt.Scan(&choice)
 
-		if choice == 1 {
+		switch choice {
+		case 1:
 			fmt.Println("Your balance is:", accountBalance)
-		} else if choice == 2 {
+		case 2:
 			fmt.Print("Your deposit: ")
 			var depositAmount float64
 			fmt.Scan(&depositAmount)
@@ -32,7 +63,8 @@ Your choice: `)
 
 			accountBalance += depositAmount
 			fmt.Println("Your new balance:", accountBalance)
-		} else if choice == 3 {
+			writeBalaceToFile(accountBalance)
+		case 3:
 			fmt.Print("Withdrawl amount:")
 			var withdrwalAmount float64
 			fmt.Scan(&withdrwalAmount)
@@ -49,11 +81,11 @@ Your choice: `)
 
 			accountBalance -= withdrwalAmount
 			fmt.Println("Your new balance:", accountBalance)
-		} else {
+			writeBalaceToFile(accountBalance)
+		default:
 			fmt.Println("Goodbye!")
-			break
+			fmt.Println("Thanks for choosing Go bank.")
+			return
 		}
 	}
-
-	fmt.Println("Thanks for choosing Go bank.")
 }
