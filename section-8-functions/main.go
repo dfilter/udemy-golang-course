@@ -2,31 +2,23 @@ package main
 
 import "fmt"
 
-/*
-functions are first class values and can be passed as values to other functions
-*/
-
 func main() {
-	numbers := []int{1, 2, 3, 4}
-	fmt.Println(numbers)
+	numbers := []int{1, 10, 15}
+	// Numbers can be pulled out of their slice by using ... turning each value into its own arugment
+	sumSlice := sumup(1, numbers...)
+	fmt.Println(sumSlice)
 
-	doubled := doubleNumbers(&numbers)
-	fmt.Println(doubled)
-
+	sum := sumup(1, 10, 15)
+	fmt.Println(sum)
 }
 
-func doubleNumbers(numbers *[]int) []int {
-	dNumbers := []int{}
-	for _, value := range *numbers {
-		dNumbers = append(dNumbers, double(value))
+// This is a variadic function in that it can take any number of aguments in this case of type int
+func sumup(startingNumber int, numbers ...int) int {
+	sum := startingNumber
+
+	for _, val := range numbers {
+		sum += val
 	}
-	return dNumbers
-}
 
-func double(number int) int {
-	return number * 2
-}
-
-func triple(number int) int {
-	return number * 3
+	return sum
 }
